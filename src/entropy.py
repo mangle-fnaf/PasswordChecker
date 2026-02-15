@@ -7,7 +7,7 @@ def calculate_entropy(password):
     if any(c.islower() for c in password):
         charset_size +=26
     if any(c.isupper() for c in password):
-        charset_size +=20
+        charset_size +=26
     if any(c.isdigit() for c in password):
         charset_size +=10  
     if any(c in string.punctuation for c in password):
