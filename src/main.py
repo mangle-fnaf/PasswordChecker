@@ -3,6 +3,8 @@
 import getpass
 from entropy import calculate_entropy, crack_time_estimate
 from Secure_generator import Secure_generator
+from patterns import repeated_characters
+from patterns import pattern_detected
 
 def strength_level(entropy):
     if entropy < 30:
@@ -30,7 +32,10 @@ def main():
         print(f"\npassword length: {length}")
     #more bits means a stronger password
         entropy = calculate_entropy(password)
-        print(f"password entropy: {entropy} bits")
+        detected, issues = pattern_detected(password)
+        entropy -= detected
+        for issue in issues:
+            print(f"Pattern is too weak: {issue}")
 
         crack_time = crack_time_estimate(entropy)
         print(f"The estimated crack time: {crack_time}")
@@ -49,12 +54,15 @@ def main():
             password = Secure_generator(length, Lower_Letters, Upper_Letters, symbols, digits)
 
             entropy = calculate_entropy(password)
+            if repeated_characters(password):
+                print("repeated characters detected. This is a weak password.")
+                entropy -=10
             crack_time = crack_time_estimate(entropy)
             strength_text, strength_color = strength_level(entropy)
 
             print(f"\nGenerated secure password: {password}")
             print(f"Password entropy: {entropy} bits")
-            print(f"Estimated crack-time: {crack_time_estimate}\n")
+            print(f"Estimated crack-time: {crack_time}\n")
             print(f"password strength: {strength_text} ({strength_color})")
             print("This password can now be copied to use.")
 
