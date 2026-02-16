@@ -47,7 +47,15 @@ def main():
             digits = input("Would you like to include digits? (y/n)").strip().lower() == 'y'
 
             password = Secure_generator(length, Lower_Letters, Upper_Letters, symbols, digits)
+
+            entropy = calculate_entropy(password)
+            crack_time = crack_time_estimate(entropy)
+            strength_text, strength_color = strength_level(entropy)
+
             print(f"\nGenerated secure password: {password}")
+            print(f"Password entropy: {entropy} bits")
+            print(f"Estimated crack-time: {crack_time_estimate}\n")
+            print(f"password strength: {strength_text} ({strength_color})")
             print("This password can now be copied to use.")
 
         except ValueError as E:
