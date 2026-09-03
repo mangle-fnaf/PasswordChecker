@@ -15,3 +15,6 @@ This formula assumes:
 - Each character is random
 - All characters detected are equally as likely
 
+Keyboard patterns:
+research suggests some keyboard patterns are most commonly used such as 'asdf' or 'qwertyuiop'. Keys that are closer together are more commonly used for passwords as they are easier to remember.
+

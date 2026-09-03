@@ -1,7 +1,11 @@
 import secrets
 import string
+from patterns import pattern_detected
+from wordlists.common_passwords import load_wordlist
 
-def Secure_generator(length=15, Lower_Letters=True, Upper_Letters=True, digits=True,symbols=True):
+wordlist = load_wordlist()
+
+def Secure_generator(length=15, Lower_Letters=True, Upper_Letters=True, digits=True, symbols=True):
 
     if length < 9:
         raise ValueError("Password too short. It must be a minimum of 9 characters.")
@@ -27,5 +31,12 @@ def Secure_generator(length=15, Lower_Letters=True, Upper_Letters=True, digits=T
 
     secrets.SystemRandom().shuffle(password)
 
-    return ''.join(password)
-    
+    password = ''.join(password)
+
+    detected, issues = pattern_detected(password, wordlist)
+
+    while detected > 0:
+        password = Secure_generator(length, Lower_Letters, Upper_Letters, digits, symbols)
+        detected, issues = pattern_detected(password, wordlist)
+
+    return password

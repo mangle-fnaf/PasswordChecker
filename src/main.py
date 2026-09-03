@@ -6,6 +6,9 @@ from Secure_generator import Secure_generator
 from patterns import repeated_characters
 from patterns import pattern_detected
 
+from wordlists.common_passwords import load_wordlist
+wordlist = load_wordlist()
+
 def strength_level(entropy):
     if entropy < 30:
         return "Extremely weak", "red"
@@ -23,19 +26,28 @@ def strength_level(entropy):
 def main():
     print("Password Security Checker")
 
-    choice = input("Enter 1 to check the security of a password and 2 to generate a secure password.")
+    choice = input("Enter 1 to check the security of a password, 2 to generate a secure password, or 3 to generate an NCSC passphrase.")
 
     if choice == '1':
         password = getpass.getpass("Enter your password:")
-    #calculates length of password
         length = len(password)
         print(f"\npassword length: {length}")
-    #more bits means a stronger password
+    
         entropy = calculate_entropy(password)
-        detected, issues = pattern_detected(password)
+        detected, issues = pattern_detected(password, wordlist)
         entropy -= detected
+
         for issue in issues:
             print(f"Pattern is too weak: {issue}")
+
+        if length < 12:
+            print("NCSC guidance: Passwords should be at least 12 characters long.")
+
+        if password.lower() in wordlist:
+            print("NCSC guidance: This password is commonly used and should not be used.")
+
+        if entropy < 50:
+            print("NCSC recommendation: Use a passphrase made of three random words.")
 
         crack_time = crack_time_estimate(entropy)
         print(f"The estimated crack time: {crack_time}")
@@ -54,9 +66,12 @@ def main():
             password = Secure_generator(length, Lower_Letters, Upper_Letters, symbols, digits)
 
             entropy = calculate_entropy(password)
-            if repeated_characters(password):
-                print("repeated characters detected. This is a weak password.")
-                entropy -=10
+            detected, issues = pattern_detected(password, wordlist) 
+            entropy -= detected 
+
+            for issue in issues:
+                print(f"Pattern is too weak: {issue}")
+
             crack_time = crack_time_estimate(entropy)
             strength_text, strength_color = strength_level(entropy)
 
@@ -68,10 +83,16 @@ def main():
 
         except ValueError as E:
             print(f"\nError: {E}\n")
-        
+
+    elif choice == '3':
+        from Secure_passphrase import generate_passphrase
+        passphrase = generate_passphrase()
+        entropy = calculate_entropy(passphrase)
+        print(f"\nGenerated NCSC passphrase: {passphrase}")
+        print(f"Entropy: {entropy} bits")
+
     else:
         print("\nInvalid answer. Run the program again if desired.\n")
-        
+
 if __name__ == "__main__":
     main()
-
